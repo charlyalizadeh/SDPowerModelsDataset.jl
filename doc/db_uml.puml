@@ -1,0 +1,48 @@
+@startuml
+entity instance {
+    * id INTEGER
+    --
+    * name TEXT
+    * scenario TEXT
+    * data_path TEXT
+    * date TEXT
+    * source TEXT
+    nb_vertex INTEGER
+    nb_edge INTEGER
+    dot_path TEXT
+}
+
+entity decomposition {
+    * id INTEGER
+    --
+    * dot_path TEXT
+    * nb_added_edge INTEGER
+    * decomposition_alg TEXT
+    * merge_alg TEXT
+    * date TEXT
+    * process_path TEXT
+}
+
+entity combination {
+    * id INTEGER
+    --
+    * in_id1 INTEGER
+    * in_id2 INTEGER
+    * out_id INTEGER
+    * process_path TEXT
+}
+
+entity solve {
+    * id INTEGER
+    --
+    * solve_time REAL
+    * solver TEXT
+    * date TEXT
+    * objective REAL
+    * solve_data_path TEXT
+}
+
+instance }|--|| decomposition
+decomposition }|--|| solve
+combination }|--|| decomposition
+@enduml
