@@ -1,4 +1,4 @@
-function add_instance(db::SQLite.DB,
+function insert_instance!(db::SQLite.DB,
                       name::String, scenario::String, source::String,
                       date::String,
                       data_path::String, dot_path::String,
@@ -10,7 +10,7 @@ function add_instance(db::SQLite.DB,
     execute_query(db, query)
 end
 
-function add_instance(db::SQLite.DB, path::String, scenario::String, source::String)
+function insert_instance!(db::SQLite.DB, path::String, scenario::String, source::String)
     data = PowerModels.parse_file(path)
     date = Dates.now()
     adj, lookup_index = PowerModels._adjacency_matrix()
@@ -19,5 +19,5 @@ function add_instance(db::SQLite.DB, path::String, scenario::String, source::Str
     graph = SimpleGraph(adj)
     dot_path = "data/graph/instance/$(data["name"])_$(scenario).dot"
     _export(dot_path, graph)
-    add_instance(db, data["name"], scenario, source, date, path, dot_path, nv(graph), ne(graph))
+    insert_instance!(db, data["name"], scenario, source, date, path, dot_path, nv(graph), ne(graph))
 end

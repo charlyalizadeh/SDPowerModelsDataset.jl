@@ -3,4 +3,4 @@ function execute_query(db, query)
 end
 
 include("create_db.jl")
-include("add_instance.jl")
+include("insert_instance.jl")
