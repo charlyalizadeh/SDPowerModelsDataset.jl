@@ -1,11 +1,13 @@
-using PowerModelsDataset
+using SDPowerModelsDataset
 using Test
 using Graphs
 
-@testset "PowerModelsDataset.jl" begin
+@testset "SDPowerModelsDataset.jl" begin
+    @testset "inserting instance in the database" begin
+    end
     @testset "exporting graph to the dot format" begin
         graph = SimpleGraph([0 1 0 0 1; 1 0 1 0 1; 0 1 0 0 0; 0 0 0 0 1; 1 1 0 1 0])
-        PowerModelsDataset._export_graph(graph, "temp.gv")
+        SDPowerModelsDataset._export_graph(graph, "temp.gv")
         file_str = read(open("temp.gv", "r"), String)
         @test file_str == """graph {
     1 -- 2;

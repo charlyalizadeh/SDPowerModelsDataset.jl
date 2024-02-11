@@ -1,4 +1,4 @@
-module PowerModelsDataset
+module SDPPowerModelsDataset
 
 
 using PowerModels
