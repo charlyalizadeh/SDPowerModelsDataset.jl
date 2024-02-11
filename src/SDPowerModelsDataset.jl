@@ -2,7 +2,11 @@ module SDPowerModelsDataset
 
 using TOML
 
-config = TOML.parse(read(String, "config.toml"))
+config = TOML.parse(read(open("config.toml", "r"), String))
+if occursin("~", config["data_path"])
+    config["data_path"] = replace(config["data_path"], "~" => homedir())
+end
+isdir(config["data_path"]) || mkdir(config["data_path"])
 
 using PowerModels
 using Dates
