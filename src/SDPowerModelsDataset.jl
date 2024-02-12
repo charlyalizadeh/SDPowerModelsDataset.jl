@@ -14,6 +14,9 @@ let graph_path = joinpath(config["data_path"], "graph")
     isdir(instance_path) || mkdir(instance_path)
     isdir(decomposition_path) || mkdir(decomposition_path)
 end
+let process_path = joinpath(config["data_path"], "process")
+    isdir(process_path) || mkdir(process_path)
+end
 
 using PowerModels
 using Dates
