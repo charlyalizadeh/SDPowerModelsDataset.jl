@@ -1,7 +1,7 @@
-function execute_query(db, query)
+function execute_query(db, query; mpi=true)
     DBInterface.execute(db, query)
 end
 
 include("create_db.jl")
-include("insert_instance.jl")
-include("insert_decomposition.jl")
+include("insert/insert_instance.jl")
+include("insert/insert_decomposition.jl")

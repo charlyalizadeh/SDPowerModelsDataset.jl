@@ -12,7 +12,7 @@ end
 
 function insert_instance!(db::SQLite.DB, path::AbstractString, scenario::AbstractString = "0")
     data = PowerModels.parse_file(path)
-    date = Dates.now()
+    date = Dates.format(Dates.now(), "dd-mm-yyy HH:MM:SS:sss")
     pm = PowerModels.instantiate_model(data,
                                        PowerModels.SparseSDPWRMPowerModel,
                                        PowerModels.build_opf)
