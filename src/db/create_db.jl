@@ -6,7 +6,7 @@ function create_pm_table_instance(db::SQLite.DB)
         id INTEGER NOT NULL,
         name TEXT NOT NULL,
         scenario TEXT NOT NULL,
-        source TEXT NOT NULL,
+        source_type TEXT NOT NULL,
         date TEXT NOT NULL,
         data_path TEXT NOT NULL,
         dot_path TEXT NOT NULL,
@@ -83,8 +83,8 @@ function create_pm_tables(db::SQLite.DB)
     create_pm_table_combination(db)
 end
 
-function create_pm_db(name::AbstractString="powermodels_db.sqlite"; delete_if_exists=false)
-    db = SQLite.DB(name)
+function create_pm_db(path::AbstractString="powermodels_db.sqlite"; delete_if_exists=false)
+    db = SQLite.DB(path)
     if delete_if_exists
         delete_table(db, table) = DBInterface.execute(db, "DROP TABLE IF EXISTS $table")
         delete_table(db, "instance")
