@@ -4,8 +4,9 @@ using Graphs
 
 @testset "SDPowerModelsDataset.jl" begin
     @testset "inserting instance in the database" begin
-        db = create_pm_db()
+        db = create_pm_db("test_pm_db.sqlite")
         insert_instance!(db, "data/case14.m")
+        rm("test_pm_db.sqlite")
     end
     @testset "exporting graph to the dot format" begin
         graph = SimpleGraph([0 1 0 0 1; 1 0 1 0 1; 0 1 0 0 0; 0 0 0 0 1; 1 1 0 1 0])
