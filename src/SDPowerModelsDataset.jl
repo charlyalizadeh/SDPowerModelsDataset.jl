@@ -4,7 +4,7 @@ using TOML
 
 config_path = "config.toml"
 try
-    config_path = joinpath(pathof(SDPowerModelsDataset), "..", "config.toml")
+    config_path = joinpath(@__DIR__, "..", "config.toml")
 catch e
     println(e)
 end
