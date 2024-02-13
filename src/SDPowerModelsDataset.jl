@@ -2,7 +2,13 @@ module SDPowerModelsDataset
 
 using TOML
 
-config = TOML.parse(read(open("config.toml", "r"), String))
+config_path = "config.toml"
+try
+    config_path = joinpath(pathof(SDPowerModelsDataset), "..", "config.toml")
+catch e
+    println(e)
+end
+config = TOML.parse(read(open(config_path, "r"), String))
 if occursin("~", config["data_path"])
     config["data_path"] = replace(config["data_path"], "~" => homedir())
 end
