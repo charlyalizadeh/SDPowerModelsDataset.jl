@@ -2,15 +2,13 @@ module SDPowerModelsDataset
 
 using TOML
 
-config_path = "config.toml"
-try
-    config_path = joinpath(@__DIR__, "..", "config.toml")
-catch e
-    println(e)
-end
+config_path = joinpath(@__DIR__, "..", "config.toml")
 config = TOML.parse(read(open(config_path, "r"), String))
 if occursin("~", config["data_path"])
     config["data_path"] = replace(config["data_path"], "~" => homedir())
+end
+if config["data_path"] == ""
+    config["data_path"] = joinpath(@__DIR__, "..", "data")
 end
 isdir(config["data_path"]) || mkdir(config["data_path"])
 let graph_path = joinpath(config["data_path"], "graph")
