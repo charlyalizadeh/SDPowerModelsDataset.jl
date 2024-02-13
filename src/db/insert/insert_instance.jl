@@ -20,7 +20,7 @@ function insert_instance!(db::SQLite.DB, path::AbstractString, scenario::Abstrac
     perm = [findfirst(li -> li == i, lookup_index) for i in 1:length(data["bus"])]
     adj = adj[perm, perm]
     graph = SimpleGraph(adj)
-    dot_path = "$(config["data_path"])graph/instance/$(data["name"])_$(scenario).dot"
+    dot_path = joinpath(config["graph_path"], "$(data["name"])_$(scenario).dot")
     _export_graph(graph, dot_path)
     insert_instance!(db, data["name"], scenario, data["source_type"], date, path, dot_path, nv(graph), ne(graph))
 end
