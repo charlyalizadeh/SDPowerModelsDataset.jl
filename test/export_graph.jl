@@ -9,5 +9,7 @@
     2 -- 5;
     4 -- 5;
 }"""
+    graph2 = SDPowerModelsDataset._import_graph("temp.gv")
+    @test graph == graph2
     rm("temp.gv")
 end
