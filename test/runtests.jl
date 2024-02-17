@@ -1,12 +1,15 @@
 using SDPowerModelsDataset
 using Test
 using Graphs
+using SQLite
+using DataFrames
+using PowerModels
 
 const testdir = dirname(@__FILE__)
 tests = [
-        "db/insert",
+        "insert",
         "export_graph",
-        "process"
+        "decompose"
 ]
 
 @testset "SDPowerModelsDataset.jl" begin
