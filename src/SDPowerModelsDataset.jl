@@ -11,26 +11,38 @@ if config["data_path"] == ""
     config["data_path"] = normpath(joinpath(@__DIR__, "..", "data"))
 end
 isdir(config["data_path"]) || mkdir(config["data_path"])
-config["graph_path"] = joinpath(config["data_path"], "graph")
-config["instance_path"] = joinpath(config["graph_path"], "instance")
-config["decomposition_path"] = joinpath(config["graph_path"], "decomposition")
-config["process_path"] = joinpath(config["data_path"], "process")
-isdir(config["graph_path"]) || mkdir(config["graph_path"])
-isdir(config["instance_path"]) || mkdir(config["instance_path"])
-isdir(config["decomposition_path"]) || mkdir(config["decomposition_path"])
-isdir(config["process_path"]) || mkdir(config["process_path"])
+config["adj_path"] = Dict()
+config["adj_path"]["instance"] = joinpath(config["data_path"], "adj", "instance")
+config["adj_path"]["decomposition"] = joinpath(config["data_path"], "adj", "decomposition")
+isdir(config["adj_path"]["instance"]) || mkpath(config["adj_path"]["instance"])
+isdir(config["adj_path"]["decomposition"]) || mkpath(config["adj_path"]["decomposition"])
 
 using PowerModels
 using Dates
 using Graphs
+using SparseArrays
+using Random
+using UUIDs
 using DelimitedFiles
+using DataFrames
+using FileIO
+using JLD2
 
-include("export_graph.jl")
-include("db/db.jl")
+include("utils.jl")
+include("graphs/export_graph.jl")
+include("graphs/features.jl")
+include("db.jl")
+include("create_db.jl")
+include("query/select_instance.jl")
+include("insert/insert_instance.jl")
+include("insert/insert_decomposition.jl")
+include("decompose.jl")
+include("solve.jl")
 
 export create_pm_db
 export insert_instance!, insert_instances!
 export insert_decomposition!
+export generate_decomposition!
 
 
 end
