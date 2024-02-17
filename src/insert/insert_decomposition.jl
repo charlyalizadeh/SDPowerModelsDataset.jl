@@ -1,7 +1,7 @@
 function insert_decomposition!(db::SQLite.DB,
                                name::AbstractString, scenario::AbstractString,
                                adj_path::AbstractString,
-                               lookup_index_path::AbstractString, perm_path::AbstractString, cliques_path::AbstractString,
+                               lookup_index_path::AbstractString, cliques_path::AbstractString,
                                nb_added_edge::Int,
                                decomposition_alg::AbstractString, date::AbstractString,
                                merge_alg::Union{AbstractString, Nothing})
@@ -13,8 +13,8 @@ function insert_decomposition!(db::SQLite.DB,
         value_query_addon = ", '$(merge_alg)'"
     end
     query = """
-    INSERT INTO decomposition(name, scenario, adj_path, lookup_index_path, perm_path, cliques_path, nb_added_edge, decomposition_alg, date$(insert_query_addon))
-    VALUES('$name', '$scenario', '$adj_path', '$lookup_index_path', '$perm_path', '$cliques_path', $nb_added_edge, '$decomposition_alg', '$date'$(value_query_addon))
+    INSERT INTO decomposition(name, scenario, adj_path, lookup_index_path, cliques_path, nb_added_edge, decomposition_alg, date$(insert_query_addon))
+    VALUES('$name', '$scenario', '$adj_path', '$lookup_index_path', '$cliques_path', $nb_added_edge, '$decomposition_alg', '$date'$(value_query_addon))
     """
     execute_query(db, query)
 end
@@ -30,15 +30,13 @@ function insert_decomposition!(db::SQLite.DB,
     uuid = uuid1(MersenneTwister(42))
     date = Dates.format(Dates.now(), "dd-mm-yyy HH:MM:SS:sss")
 
-    adj_path = joinpath(config["adj_path"]["decomposition"], "$(name)_$(scenario)_$(uuid)_cadj.txt")
-    perm_path = joinpath(config["adj_path"]["decomposition"], "$(name)_$(scenario)_$(uuid)_perm.txt")
-    cliques_path = joinpath(config["adj_path"]["decomposition"], "$(name)_$(scenario)_$(uuid)_cliques.txt")
+    adj_path = joinpath(config["adj_path"]["decomposition"], "$(name)_$(scenario)_$(uuid)_data.txt")
+    cliques_path = joinpath(config["adj_path"]["decomposition"], "$(name)_$(scenario)_$(uuid)_cliques.jld2")
 
     writedlm(adj_path, adj)
-    writedlm(perm_path, perm)
-    writedlm(cliques_path, cliques)
+    jldsave(cliques_path; cliques, perm)
 
-    insert_decomposition!(db, name, scenario, adj_path, lookup_index_path, perm_path, cliques_path, nb_added_edge, decomposition_alg, date, merge_alg)
+    insert_decomposition!(db, name, scenario, adj_path, lookup_index_path, cliques_path, nb_added_edge, decomposition_alg, date, merge_alg)
 end
 
 

@@ -27,6 +27,9 @@ using DelimitedFiles
 using DataFrames
 using FileIO
 using JLD2
+using InfrastructureModels
+using JuMP
+using SCS
 
 include("utils.jl")
 include("graphs/export_graph.jl")
@@ -34,6 +37,7 @@ include("graphs/features.jl")
 include("db.jl")
 include("create_db.jl")
 include("query/select_instance.jl")
+include("query/select_decomposition.jl")
 include("insert/insert_instance.jl")
 include("insert/insert_decomposition.jl")
 include("decompose.jl")
@@ -43,6 +47,7 @@ export create_pm_db
 export insert_instance!, insert_instances!
 export insert_decomposition!
 export generate_decomposition!
+export solve_decomposition!
 
 
 end

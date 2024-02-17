@@ -29,7 +29,6 @@ function create_pm_table_decomposition(db::SQLite.DB)
         scenario TEXT NOT NULL,
         adj_path TEXT NOT NULL,
         lookup_index_path TEXT NOT NULL,
-        perm_path TEXT NOT NULL,
         cliques_path TEXT NON NULL,
         nb_added_edge INTEGER NOT NULL,
         decomposition_alg TEXT NOT NULL,
