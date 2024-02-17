@@ -9,7 +9,8 @@ function create_pm_table_instance(db::SQLite.DB)
         source_type TEXT NOT NULL,
         date TEXT NOT NULL,
         data_path TEXT NOT NULL,
-        dot_path TEXT NOT NULL,
+        adj_path TEXT NOT NULL,
+        lookup_index_path TEXT NOT NULL,
         nb_vertex INTEGER NOT NULL,
         nb_edge INTEGER NOT NULL,
 
@@ -26,18 +27,22 @@ function create_pm_table_decomposition(db::SQLite.DB)
         id INTEGER NOT NULL,
         name TEXT NOT NULL,
         scenario TEXT NOT NULL,
-        dot_path TEXT NOT NULL,
+        adj_path TEXT NOT NULL,
+        lookup_index_path TEXT NOT NULL,
+        perm_path TEXT NOT NULL,
+        cliques_path TEXT NON NULL,
         nb_added_edge INTEGER NOT NULL,
         decomposition_alg TEXT NOT NULL,
         date TEXT NOT NULL,
-        process_path TEXT NOT NULL,
 
         merge_alg TEXT,
 
         PRIMARY KEY(id),
-        FOREIGN KEY(name, scenario) REFERENCES instance(name, scenario)
+        FOREIGN KEY(name, scenario) REFERENCES instance(name, scenario),
+        FOREIGN KEY(lookup_index_path) REFERENCES instance(lookup_index_path)
     )
     """
+    SQLite.execute(db, query)
 end
 
 function create_pm_table_solve(db::SQLite.DB)
@@ -56,6 +61,7 @@ function create_pm_table_solve(db::SQLite.DB)
         FOREIGN KEY(dec_id) REFERENCES decomposition(id)
     )
     """
+    SQLite.execute(db, query)
 end
 
 function create_pm_table_combination(db::SQLite.DB)
@@ -74,6 +80,7 @@ function create_pm_table_combination(db::SQLite.DB)
         UNIQUE(in_id1, in_id2, out_id, process_path)
     )
     """
+    SQLite.execute(db, query)
 end
 
 function create_pm_tables(db::SQLite.DB)
