@@ -28,6 +28,6 @@ function insert_instances!(db::SQLite.DB, paths::Vector{<:AbstractString},
                            extract_scenario::Union{Function, Nothing} = nothing)
     for path in paths
         scenario = isnothing(extract_scenario) ? "0" : extract_scenario(path)
-        insert_instance!(db, p, scenario)
+        insert_instance!(db, path, scenario)
     end
 end
