@@ -42,13 +42,13 @@ end
 
 
 function insert_solve!(db::SQLite.DB,
-                       dec_id::Int, time::Float64, solver::AbstractString,
+                       decomposition_id::Int, time::Float64, solver::AbstractString,
                        date::AbstractString, objective::Float64, data_path::AbstractString,
                        log_path::AbstractString)
 
     query = """
-    INSERT INTO solve(dec_id, time, solver, date, objective, data_path, log_path)
-    VALUES($dec_id, $time, '$solver', '$date', $objective, '$data_path', '$log_path')
+    INSERT INTO solve(decomposition_id, time, solver, date, objective, data_path, log_path)
+    VALUES($decomposition_id, $time, '$solver', '$date', $objective, '$data_path', '$log_path')
     """
     execute_query(db, query)
 end

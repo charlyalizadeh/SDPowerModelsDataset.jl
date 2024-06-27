@@ -21,10 +21,11 @@ end
 function get_ids_instance_not_decomposed(db::SQLite.DB; decomposition_alg::OPFSDP.AbstractChordalExtension)
     println("DECOMPOSITION ALG: $(get_object_str(decomposition_alg))")
     query = """
-            SELECT id FROM instance
-            WHERE id NOT IN (
-                SELECT d.id FROM decomposition d
-                WHERE d.decomposition_alg = '$(get_object_str(decomposition_alg))'
+            SELECT i.id FROM instance i
+            WHERE NOT EXISTS (
+                SELECT 1 FROM decomposition d
+                WHERE i.name = d.name AND i.scenario = d.scenario
+                AND d.decomposition_alg = '$(get_object_str(decomposition_alg))'
             )
             """
     results = execute_query(db, query; mpi=false) |> DataFrame
@@ -33,6 +34,12 @@ end
 
 function get_ids_instance(db::SQLite.DB)
     query = "SELECT id FROM instance"
+    results = execute_query(db, query; mpi=false) |> DataFrame
+    return results[!, :id]
+end
+
+function get_ids_instance_no_features(db::SQLite.DB)
+    query = "SELECT id FROM instance WHERE id NOT IN (SELECT instance_id FROM feature_instance)"
     results = execute_query(db, query; mpi=false) |> DataFrame
     return results[!, :id]
 end

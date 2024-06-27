@@ -8,7 +8,7 @@ function combine_decomposition!(db::SQLite.DB, decomposition1::DataFrameRow, dec
     cliques = OPFSDP.maximal_cliques(cadj)
     cliquetree = OPFSDP.maximal_cliquetree(cliques)
 
-    nb_added_edge = decomposition1[:nb_added_edge] + (ne(cadj) - ne(adj1))
+    nb_added_edge = decomposition1[:nb_added_edge] + (ne_matrix(cadj) - ne_matrix(adj1))
 
     uuid = insert_decomposition!(db,
                                  decomposition1[:name], string(decomposition1[:scenario]),

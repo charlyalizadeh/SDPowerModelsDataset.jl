@@ -76,6 +76,12 @@ function get_ids_decomposition_not_solved(db::SQLite.DB)
     return results[!, :id]
 end
 
+function get_ids_decomposition_no_features(db::SQLite.DB)
+    query = "SELECT id FROM decomposition WHERE id NOT IN (SELECT decomposition_id FROM feature_decomposition)"
+    results = execute_query(db, query; mpi=false) |> DataFrame
+    return results[!, :id]
+end
+
 function get_decomposition_id(db::SQLite.DB, uuid::AbstractString)
 	query = "SELECT id FROM decomposition WHERE uuid = '$uuid'"
 	result = execute_query(db, query; return_results=true)
@@ -89,3 +95,4 @@ function get_decomposition_data_path(db::SQLite.DB, name::AbstractString, scenar
     result = execute_query(db, query; return_results=true) |> DataFrame
     return result[1, :data_path]
 end
+

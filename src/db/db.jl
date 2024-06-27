@@ -9,6 +9,7 @@ function execute_query_mpi_return(db, query)
     query = "[RETURN]" * query
     query = [c for c in query]
     MPI.send(query, MPI.COMM_WORLD; dest=0)
+    old_query = query
     while true
         has_recieved, status = MPI.Iprobe(MPI.COMM_WORLD, MPI.Status; source=0)
         if has_recieved

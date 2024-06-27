@@ -8,8 +8,6 @@ function create_pm_table_instance(db::SQLite.DB)
         date TEXT NOT NULL,
         data_path TEXT NOT NULL,
         adj_path TEXT NOT NULL,
-        nb_vertex INTEGER NOT NULL,
-        nb_edge INTEGER NOT NULL,
 
         UNIQUE(name, scenario),
         PRIMARY KEY(id)
@@ -60,7 +58,7 @@ function create_pm_table_solve(db::SQLite.DB)
     query = """
     CREATE TABLE IF NOT EXISTS solve(
         id INTEGER NOT NULL,
-        dec_id INTEGER NOT NULL,
+        decomposition_id INTEGER NOT NULL,
         time REAL NOT NULL,
         solver TEXT NOT NULL,
         date TEXT NOT NULL,
@@ -69,7 +67,7 @@ function create_pm_table_solve(db::SQLite.DB)
         log_path TEXT NOT NULL,
 
         PRIMARY KEY(id),
-        FOREIGN KEY(dec_id) REFERENCES decomposition(id) ON DELETE CASCADE
+        FOREIGN KEY(decomposition_id) REFERENCES decomposition(id) ON DELETE CASCADE
     )
     """
     DBInterface.execute(db, query)
@@ -93,12 +91,74 @@ function create_pm_table_combination(db::SQLite.DB)
     DBInterface.execute(db, query)
 end
 
+function create_pm_table_feature_instance(db::SQLite.DB)
+    query = """
+    CREATE TABLE IF NOT EXISTS feature_instance(
+        id INTEGER NOT NULL,
+        instance_id INTEGER NOT NULL,
+
+        nv INTEGER NOT NULL,
+        ne INTEGER NOT NULL,
+        deg_max INTEGER NOT NULL,
+        deg_min INTEGER NOT NULL,
+        deg_mean INTEGER NOT NULL,
+        deg_median INTEGER NOT NULL,
+        deg_var INTEGER NOT NULL,
+        glc REAL NOT NULL,
+        density REAL NOT NULL,
+        diameter INTEGER NOT NULL,
+        radius INTEGER NOT NULL,
+
+        PRIMARY KEY(id),
+        FOREIGN KEY(instance_id) REFERENCES instance(id),
+        UNIQUE(instance_id)
+    )
+    """
+    DBInterface.execute(db, query)
+end
+
+function create_pm_table_feature_decomposition(db::SQLite.DB)
+    query = """
+    CREATE TABLE IF NOT EXISTS feature_decomposition(
+        id INTEGER NOT NULL,
+        decomposition_id INTEGER NOT NULL,
+
+        nv INTEGER NOT NULL,
+        ne INTEGER NOT NULL,
+        deg_max INTEGER NOT NULL,
+        deg_min INTEGER NOT NULL,
+        deg_mean INTEGER NOT NULL,
+        deg_median INTEGER NOT NULL,
+        deg_var INTEGER NOT NULL,
+        glc REAL NOT NULL,
+        density REAL NOT NULL,
+        diameter INTEGER NOT NULL,
+        radius INTEGER NOT NULL,
+        nclq INTEGER NOT NULL,
+        clqsize_max INTEGER NOT NULL,
+        clqsize_min INTEGER NOT NULL,
+        clqsize_mean INTEGER NOT NULL,
+        clqsize_median INTEGER NOT NULL,
+        clqsize_var INTEGER NOT NULL,
+
+
+        PRIMARY KEY(id),
+        FOREIGN KEY(decomposition_id) REFERENCES decomposition(id),
+        UNIQUE(decomposition_id)
+    )
+    """
+    DBInterface.execute(db, query)
+end
+
+
 function create_pm_tables(db::SQLite.DB)
     create_pm_table_instance(db)
     create_pm_table_decomposition(db)
     create_pm_table_merge(db)
     create_pm_table_solve(db)
     create_pm_table_combination(db)
+    create_pm_table_feature_instance(db)
+    create_pm_table_feature_decomposition(db)
 end
 
 function create_pm_db(path::AbstractString="opfsdp.sqlite"; delete_if_exists=false)
@@ -110,6 +170,8 @@ function create_pm_db(path::AbstractString="opfsdp.sqlite"; delete_if_exists=fal
         delete_table(db, "merge")
         delete_table(db, "solve")
         delete_table(db, "combination")
+        delete_table(db, "feature_instance")
+        delete_table(db, "feature_decomposition")
     end
     create_pm_tables(db)
     return db

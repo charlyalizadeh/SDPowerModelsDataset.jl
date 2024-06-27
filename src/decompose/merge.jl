@@ -1,7 +1,7 @@
 function merge_decomposition!(db::SQLite.DB, decomposition::DataFrameRow, merge_alg::OPFSDP.AbstractMerge)
     println("Merging decomposition: ($(decomposition[:name]), $(decomposition[:scenario]), $(decomposition[:id])) using $(merge_alg)")
 	adj = sparse(readdlm(decomposition[:adj_path], '\t', Float64, '\n'))
-	ne_before_merge = ne(adj)
+	ne_before_merge = ne_matrix(adj)
     cliques_data_dict = load(decomposition[:cliques_path])
 	cliques = cliques_data_dict["cliques"]
     cliquetree = sparse(readdlm(decomposition[:cliquetree_path]))
@@ -10,7 +10,7 @@ function merge_decomposition!(db::SQLite.DB, decomposition::DataFrameRow, merge_
 	OPFSDP.merge_cliques!(adj, cliques, cliquetree, merge_alg)
     cliquetree = OPFSDP.maximal_cliquetree(cliques)
 
-	nb_added_edge = decomposition[:nb_added_edge] + (ne(adj) - ne_before_merge)
+	nb_added_edge = decomposition[:nb_added_edge] + (ne_matrix(adj) - ne_before_merge)
 
     uuid = insert_decomposition!(db,
                                  decomposition[:name], string(decomposition[:scenario]),

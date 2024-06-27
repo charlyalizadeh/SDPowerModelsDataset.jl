@@ -9,7 +9,7 @@ function generate_decomposition!(db::SQLite.DB, instance::DataFrameRow, decompos
 
     # Features extraction
     # TODO
-    nb_added_edge = ne(cadj) - ne(adj)
+    nb_added_edge = ne_matrix(cadj) - ne_matrix(adj)
 
     insert_decomposition!(db,
                           instance[:name], string(instance[:scenario]),
@@ -37,7 +37,7 @@ function generate_decomposition_one_clique!(db::SQLite.DB, instance::DataFrameRo
 
     # Features extraction
     # TODO
-    nb_added_edge = trunc(Int, (adj.n * (adj.n - 1) / 2) - ne(adj))
+    nb_added_edge = trunc(Int, (adj.n * (adj.n - 1) / 2) - ne_matrix(adj))
     cadj = sparse(ones(adj.n, adj.n))
 
     insert_decomposition!(db,

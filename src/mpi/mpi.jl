@@ -3,14 +3,18 @@ const process_functions = Dict(
     "merge_decompositions" => merge_decompositions!,
     "combine_decompositions" => combine_decompositions!,
     "delete_duplicate_decompositions" => delete_duplicate_decompositions!,
-    "solve_decompositions" => solve_decompositions!
+    "solve_decompositions" => solve_decompositions!,
+    "read_feature_instances" => read_feature_instances!,
+    "read_feature_decompositions" => read_feature_decompositions!
 )
 const ids_functions = Dict(
     "generate_decompositions" => get_ids_instance_not_decomposed,
     "merge_decompositions" => get_ids_decomposition_not_merged,
     "combine_decompositions" => get_ids_decomposition_not_combined,
     "delete_duplicate_decompositions" => get_ids_instance,
-    "solve_decompositions" => get_ids_decomposition_not_solved
+    "solve_decompositions" => get_ids_decomposition_not_solved,
+    "read_feature_instances" => get_ids_instance_no_features,
+    "read_feature_decompositions" => get_ids_decomposition_no_features
 )
 
 function mpi_init()
@@ -75,18 +79,18 @@ function assign_indexes_combine(db::SQLite.DB; kwargs...)
     if isempty(ids)
         println("Nothing to process.")
         for i in 1:nb_process
-            println("Sending to $(i - 1): [-1]")
+            println("Sending to $( 1): [-1]")
             MPI.send([-1], MPI.COMM_WORLD; dest=i)
         end
     elseif length(ids) / 2 <= nb_process
         nb_process_used = 1
         for i in 1:2:length(ids) - 1
-            println("Sending to $(i - 1): [$(ids[i])]")
+            println("Sending to $(1): [$(ids[i])]")
             MPI.send([ids[i], ids[i + 1]], MPI.COMM_WORLD; dest=nb_process_used)
             nb_process_used += 1
         end
         for i in nb_process_used:nb_process
-            println("Sending to $(i - 1): [-1]")
+            println("Sending to $(1): [-1]")
             MPI.send([-1], MPI.COMM_WORLD; dest=i)
         end
     else
@@ -130,14 +134,16 @@ function assign_indexes(db::SQLite.DB, process::AbstractString; kwargs...)
             println("Sending to $(i - 1): [$(ids[i])]")
             MPI.send([ids[i]], MPI.COMM_WORLD; dest=i)
         end
-        for i in length(ids):nb_process
+        for i in length(ids)+1:nb_process
             println("Sending to $(i - 1): [-1]")
             MPI.send([-1], MPI.COMM_WORLD; dest=i)
         end
     else
         nb_ids_per_chunk = trunc(Int, length(ids) / nb_process)
+        start = 1
+        stop = -1
         for i in 1:nb_process
-            start = (i - 1) * nb_ids_per_chunk + 1
+            start = i == 1 ? start : stop + 1
             stop = start + nb_ids_per_chunk
             stop = stop > length(ids) ? length(ids) : stop
             if i == nb_process && stop != length(ids)
@@ -223,17 +229,23 @@ end
 generate_decompositions_mpi!(db_path::AbstractString,
                              decomposition_alg::OPFSDP.AbstractChordalExtension,
                              log_dir::AbstractString=".logs/generate"; kwargs...
-                             ) = execute_process_mpi(db_path, "generate_decompositions", log_dir; decomposition_alg=decomposition_alg, kwargs...)
+                            ) = execute_process_mpi(db_path, "generate_decompositions", log_dir; decomposition_alg=decomposition_alg, kwargs...)
 merge_decompositions_mpi!(db_path::AbstractString,
                           merge_alg::OPFSDP.AbstractMerge,
                           log_dir::AbstractString=".logs/merge"; kwargs...
-                          ) = execute_process_mpi(db_path, "merge_decompositions", log_dir; merge_alg=merge_alg, kwargs...)
+                         ) = execute_process_mpi(db_path, "merge_decompositions", log_dir; merge_alg=merge_alg, kwargs...)
 solve_decompositions_mpi!(db_path::AbstractString,
                           log_dir::AbstractString=".logs/solve"; kwargs...
-                          ) = execute_process_mpi(db_path, "solve_decompositions", log_dir; kwargs...)
+                         ) = execute_process_mpi(db_path, "solve_decompositions", log_dir; kwargs...)
 combine_decompositions_mpi!(db_path::AbstractString,
                             log_dir::AbstractString=".logs/combine"; kwargs...
-                            ) = execute_process_mpi(db_path, "combine_decompositions", log_dir; kwargs...)
+                           ) = execute_process_mpi(db_path, "combine_decompositions", log_dir; kwargs...)
 delete_duplicate_decompositions_mpi!(db_path::AbstractString,
-                           log_dir::AbstractString=".logs/delete"; kwargs...
-                          ) = execute_process_mpi(db_path, "delete_duplicate_decompositions", log_dir; kwargs...)
+                                     log_dir::AbstractString=".logs/delete"; kwargs...
+                                    ) = execute_process_mpi(db_path, "delete_duplicate_decompositions", log_dir; kwargs...)
+read_feature_instances_mpi!(db_path::AbstractString,
+                            log_dir::AbstractString=".logs/read_feature_instance"; kwargs...
+                           ) = execute_process_mpi(db_path, "read_feature_instances", log_dir; kwargs...)
+read_feature_decompositions_mpi!(db_path::AbstractString,
+                                 log_dir::AbstractString=".logs/read_feature_instance"; kwargs...
+                                ) = execute_process_mpi(db_path, "read_feature_decompositions", log_dir; kwargs...)

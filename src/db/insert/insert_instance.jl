@@ -43,17 +43,18 @@ end
 function insert_instance!(db::SQLite.DB,
                           name::AbstractString, scenario::AbstractString, source_type::AbstractString,
                           date::AbstractString,
-                          data_path::AbstractString, adj_path::AbstractString,
-                          nb_vertex::Integer, nb_edge::Integer)
+                          data_path::AbstractString, adj_path::AbstractString)
     query = """
-    INSERT INTO instance(name, scenario, source_type, date, data_path, adj_path, nb_vertex, nb_edge)
-    VALUES('$name', '$scenario', '$source_type', '$date', '$data_path', '$adj_path', $nb_vertex, $nb_edge)
+    INSERT INTO instance(name, scenario, source_type, date, data_path, adj_path)
+    VALUES('$name', '$scenario', '$source_type', '$date', '$data_path', '$adj_path')
     """
     try
         execute_query(db, query; mpi=false)
     catch e
         if isa(e, SQLiteException) && e.msg == "UNIQUE constraint failed: instance.name, instance.scenario"
             println("Instance $(name) $(scenario) already in the database.")
+        else
+            println(e)
         end
     end
 end
@@ -74,7 +75,7 @@ function insert_instance!(db::SQLite.DB, path::AbstractString, name::Union{Abstr
     adj_path = joinpath(config["adj_path"]["instance"], "$(network.name)_$(scenario)_adj.txt")
     writedlm(adj_path, adj)
     source_type = _get_source_type(path)
-    insert_instance!(db, name, scenario, source_type, date, path, adj_path, nv(adj), ne(adj))
+    insert_instance!(db, name, scenario, source_type, date, path, adj_path)
 end
 
 function insert_instances!(db::SQLite.DB, paths::Vector{<:AbstractString};
@@ -86,7 +87,7 @@ function insert_instances!(db::SQLite.DB, paths::Vector{<:AbstractString};
 			println("Not loading $(path), not a matpower case file.")
 			continue
 		end
-		nv_path = nv(path)
+		nv_path = nv_file(path)
 		if nv_path < nv_min || nv_path > nv_max
 			println("Not loading $(path), this instance doesn't meet the requirement for the number of nodes ($(nv_min) <= nv <= $(nv_max) got $(nv_path))")
 			continue

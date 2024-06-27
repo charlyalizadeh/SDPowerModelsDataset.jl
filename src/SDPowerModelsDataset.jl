@@ -34,11 +34,14 @@ using Memento
 using MPI
 using CSV
 using SQLite
+using Graphs
+using Statistics
 
 _LOGGER = getlogger(@__MODULE__)
 
 include("utils.jl")
 include("graphs/features.jl")
+include("graphs/features_sparse_matrix.jl")
 include("db/db.jl")
 include("db/create_db.jl")
 include("db/query/infos.jl")
@@ -49,10 +52,12 @@ include("db/insert/insert_instance.jl")
 include("db/insert/insert_decomposition.jl")
 include("db/insert/insert_merge.jl")
 include("db/insert/insert_combine.jl")
+include("db/insert/insert_features.jl")
 include("decompose/decompose.jl")
 include("decompose/merge.jl")
 include("decompose/combine.jl")
 include("delete_duplicate.jl")
+include("read_features.jl")
 include("solve/solve.jl")
 include("mpi/mpi.jl")
 
@@ -67,6 +72,7 @@ export merge_decomposition!, merge_decompositions!
 export execute_process_mpi
 export generate_decompositions_mpi!, merge_decompositions_mpi!, solve_decompositions_mpi!
 export combine_decompositions_mpi!, delete_duplicate_decompositions_mpi!
+export read_feature_instances_mpi!, read_feature_decompositions_mpi!
 
 
 end
