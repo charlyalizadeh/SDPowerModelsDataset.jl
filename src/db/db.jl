@@ -38,7 +38,7 @@ end
 
 function execute_query(db, query; mpi=true, wait_until_executed=false, time_to_sleep=0, return_results=false)
     # If we are not using MPI
-    println("Executing query:\n=======$(query)\n=======")
+    println("Executing query:\n==========================================\n$(query)\n==========================================\n")
     if !mpi || !MPI.Initialized()
         return DBInterface.execute(db, query)
     elseif return_results
