@@ -12,7 +12,7 @@ end
 function get_decomposition_cholesky_time(db::SQLite.DB, name::AbstractString, scenario::AbstractString)
     query = """
     SELECT time FROM solve
-    WHERE dec_id = (
+    WHERE decomposition_id = (
         SELECT id FROM decomposition
         WHERE name = '$name' AND scenario = '$scenario'
         AND decomposition_alg = '(OPFSDP.CholeskyExtension|perm:nothing;shift:0.0)'

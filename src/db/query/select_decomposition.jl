@@ -45,15 +45,15 @@ function get_ids_decomposition_not_combined(db::SQLite.DB)
         FROM combination
         WHERE (in_id1 = t1.id AND in_id2 = t2.id)
         OR (in_id1 = t2.id AND in_id2 = t1.id))
-    AND EXISTS (SELECT dec_id FROM solve WHERE dec_id = t1.id)
-    AND EXISTS (SELECT dec_id FROM solve WHERE dec_id = t2.id)
-    AND (SELECT s1.time FROM solve s1 WHERE dec_id = t1.id) <= (
-            SELECT s2.time FROM solve s2 LEFT JOIN decomposition d1 ON s2.dec_id = d1.id
+    AND EXISTS (SELECT decomposition_id FROM solve WHERE decomposition_id = t1.id)
+    AND EXISTS (SELECT decomposition_id FROM solve WHERE decomposition_id = t2.id)
+    AND (SELECT s1.time FROM solve s1 WHERE decomposition_id = t1.id) <= (
+            SELECT s2.time FROM solve s2 LEFT JOIN decomposition d1 ON s2.decomposition_id = d1.id
             WHERE d1.name = t1.name AND d1.scenario = t1.scenario
             AND d1.decomposition_alg='(OPFSDP.CholeskyExtension|perm:nothing;shift:0.0)'
         )
-    AND (SELECT s3.time FROM solve s3 WHERE s3.dec_id = t2.id) <= (
-            SELECT s4.time FROM solve s4 LEFT JOIN decomposition d2 ON s4.dec_id = d2.id
+    AND (SELECT s3.time FROM solve s3 WHERE s3.decomposition_id = t2.id) <= (
+            SELECT s4.time FROM solve s4 LEFT JOIN decomposition d2 ON s4.decomposition_id = d2.id
             WHERE d2.name = t2.name AND d2.scenario = t2.scenario
             AND d2.decomposition_alg='(OPFSDP.CholeskyExtension|perm:nothing;shift:0.0)'
         )
@@ -70,7 +70,7 @@ end
 
 function get_ids_decomposition_not_solved(db::SQLite.DB)
     query = """
-    SELECT t1.id FROM decomposition t1 LEFT JOIN solve t2 ON t2.dec_id = t1.id WHERE t2.dec_id IS NULL AND t1.decomposition_alg <> 'OneClique'
+    SELECT t1.id FROM decomposition t1 LEFT JOIN solve t2 ON t2.decomposition_id = t1.id WHERE t2.decomposition_id IS NULL AND t1.decomposition_alg <> 'OneClique'
     """
     results = execute_query(db, query; mpi=false) |> DataFrame
     return results[!, :id]
