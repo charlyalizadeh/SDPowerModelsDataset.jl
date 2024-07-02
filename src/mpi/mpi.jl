@@ -210,42 +210,43 @@ function execute_process_mpi(db_path::AbstractString, process::AbstractString, l
     comm, rank, size = mpi_init()
     db = SQLite.DB(db_path)
     if rank == 0 && !check_db_initialized(db)
+	println("rank = $rank initalizing db")
         db = create_pm_db(db_path)
-        insert_instances!(db, readdir("data/matpower", join=true); nv_min=100, nv_max=500, exclude=["case_ACTIVSg200", "case118zh"])
+        insert_instances!(db, readdir("data/matpower", join=true); nv_min=1000, nv_max=10000, exclude=["case2869pegase", "case6468rte", "case6470rte", "case6495rte", "case6515rte"])
     end
     MPI.Barrier(MPI.COMM_WORLD)
     log_dir = joinpath(log_dir, process)
     !isdir(log_dir) && mkpath(log_dir)
-    #redirect_stdio(stdout=joinpath(log_dir, "$rank.txt"), stderr=joinpath(log_dir, "$rank.txt")) do
+    redirect_stdio(stdout=joinpath(log_dir, "$rank.txt"), stderr=joinpath(log_dir, "$rank.txt")) do
         println("Rank: $rank / $(size - 1)")
         if rank == 0
             execute_process_main(db, process; finalize=finalize, kwargs...)
         else
             execute_process_secondary(db, process; finalize=finalize, kwargs...)
         end
-    #end
+    end
 end
 
 generate_decompositions_mpi!(db_path::AbstractString,
                              decomposition_alg::OPFSDP.AbstractChordalExtension,
-                             log_dir::AbstractString=".logs/generate"; kwargs...
+                             log_dir::AbstractString=joinpath(dirname(db_path), "logs/generate"); kwargs...
                             ) = execute_process_mpi(db_path, "generate_decompositions", log_dir; decomposition_alg=decomposition_alg, kwargs...)
 merge_decompositions_mpi!(db_path::AbstractString,
                           merge_alg::OPFSDP.AbstractMerge,
-                          log_dir::AbstractString=".logs/merge"; kwargs...
+                          log_dir::AbstractString=joinpath(dirname(db_path), "logs/merge"); kwargs...
                          ) = execute_process_mpi(db_path, "merge_decompositions", log_dir; merge_alg=merge_alg, kwargs...)
 solve_decompositions_mpi!(db_path::AbstractString,
-                          log_dir::AbstractString=".logs/solve"; kwargs...
+                          log_dir::AbstractString=joinpath(dirname(db_path), "logs/solve"); kwargs...
                          ) = execute_process_mpi(db_path, "solve_decompositions", log_dir; kwargs...)
 combine_decompositions_mpi!(db_path::AbstractString,
-                            log_dir::AbstractString=".logs/combine"; kwargs...
+                            log_dir::AbstractString=joinpath(dirname(db_path), "logs/combine"); kwargs...
                            ) = execute_process_mpi(db_path, "combine_decompositions", log_dir; kwargs...)
 delete_duplicate_decompositions_mpi!(db_path::AbstractString,
-                                     log_dir::AbstractString=".logs/delete"; kwargs...
+                                     log_dir::AbstractString=joinpath(dirname(db_path), "logs/delete"); kwargs...
                                     ) = execute_process_mpi(db_path, "delete_duplicate_decompositions", log_dir; kwargs...)
 read_feature_instances_mpi!(db_path::AbstractString,
-                            log_dir::AbstractString=".logs/read_feature_instance"; kwargs...
+                            log_dir::AbstractString=joinpath(dirname(db_path), "logs/read_feature_instance"); kwargs...
                            ) = execute_process_mpi(db_path, "read_feature_instances", log_dir; kwargs...)
 read_feature_decompositions_mpi!(db_path::AbstractString,
-                                 log_dir::AbstractString=".logs/read_feature_instance"; kwargs...
+                                 log_dir::AbstractString=joinpath(dirname(db_path), "logs/read_feature_decomposition"); kwargs...
                                 ) = execute_process_mpi(db_path, "read_feature_decompositions", log_dir; kwargs...)
